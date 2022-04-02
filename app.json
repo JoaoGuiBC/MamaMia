@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "MamaMia",
+    "slug": "MamaMia",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
