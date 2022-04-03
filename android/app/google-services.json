@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "726316199647",
+    "project_id": "mamamia-86bed",
+    "storage_bucket": "mamamia-86bed.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:726316199647:android:d71c25555130712c78436a",
+        "android_client_info": {
+          "package_name": "com.mamamia"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "726316199647-ti3k6ccfgc63taj5bh2auuglptg87bv1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8Ct2Mhy2QJHFOJweZXVZZk-x7zIDiMY4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "726316199647-ti3k6ccfgc63taj5bh2auuglptg87bv1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
