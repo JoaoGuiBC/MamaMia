@@ -9,7 +9,12 @@ type ButtonProps = RectButtonProps & {
   isLoading?: boolean;
 };
 
-export function Button({ type = 'primary', title, isLoading = false, ...rest }: ButtonProps) {
+export function Button({
+  type = 'primary',
+  title,
+  isLoading = false,
+  ...rest
+}: ButtonProps) {
   return (
     <Container type={type} enabled={!isLoading} {...rest}>
       {isLoading ? <Load /> : <Title>{title}</Title>}
