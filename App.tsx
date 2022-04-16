@@ -1,10 +1,11 @@
 import React from 'react';
 import AppLoading from 'expo-app-loading';
 import { StatusBar } from 'expo-status-bar';
-import { Text } from 'react-native';
 import { ThemeProvider } from 'styled-components/native';
 import { useFonts, DMSans_400Regular } from '@expo-google-fonts/dm-sans';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
+
+import { SignIn } from './src/screens/SignIn';
 
 import theme from './src/theme';
 
@@ -20,18 +21,8 @@ export default function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Text>Hello World</Text>
-      <Text>Hello World</Text>
-      <Text>Hello World</Text>
-      <Text>Hello World</Text>
-      <Text>Hello World</Text>
-      <Text>Hello World</Text>
-      <Text>Hello World</Text>
-      <Text>Hello World</Text>
-      <Text>Hello World</Text>
-      <Text>Hello World</Text>
-      <Text>Hello World</Text>
-      <StatusBar style="auto" />
+      <SignIn />
+      <StatusBar style="light" translucent backgroundColor="transparent" />
     </ThemeProvider>
   );
 }
