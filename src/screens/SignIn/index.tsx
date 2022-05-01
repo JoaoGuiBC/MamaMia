@@ -48,7 +48,7 @@ export function SignIn() {
           <Input
             placeholder="Senha"
             type="secondary"
-            secureTextEntry
+            isSecret
             onChangeText={setPassword}
           />
 
