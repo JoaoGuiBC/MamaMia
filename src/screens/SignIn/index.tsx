@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import brandImg from '../../assets/brand.png';
+import brandImg from '@assets/brand.png';
 
-import { Input } from '../../components/Input';
-import { Button } from '../../components/Button';
+import { Input } from '@components/Input';
+import { Button } from '@components/Button';
+import { UseAuth } from '@hooks/auth';
 
 import {
   Container,
@@ -16,6 +18,15 @@ import {
 } from './styles';
 
 export function SignIn() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const { signIn, isLoggingIn } = UseAuth();
+
+  function handleSignIn() {
+    signIn(email, password);
+  }
+
   return (
     <Container>
       <KeyboardAvoidingView
@@ -32,18 +43,27 @@ export function SignIn() {
             autoCapitalize="none"
             autoCorrect={false}
             keyboardType="email-address"
+            onChangeText={setEmail}
           />
-          <Input placeholder="Senha" type="secondary" secureTextEntry />
+          <Input
+            placeholder="Senha"
+            type="secondary"
+            secureTextEntry
+            onChangeText={setPassword}
+          />
 
           <ForgotPasswordButton>
             <ForgotPasswordLabel>Esqueci minha senha</ForgotPasswordLabel>
           </ForgotPasswordButton>
 
-          <Button
-            title="Entrar"
-            type="secondary"
-            onPress={() => console.log('test')}
-          />
+          <GestureHandlerRootView>
+            <Button
+              title="Entrar"
+              type="secondary"
+              onPress={handleSignIn}
+              isLoading={isLoggingIn}
+            />
+          </GestureHandlerRootView>
         </Content>
       </KeyboardAvoidingView>
     </Container>

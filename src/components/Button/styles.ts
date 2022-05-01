@@ -1,10 +1,12 @@
 import styled, { css } from 'styled-components/native';
 import { RectButton } from 'react-native-gesture-handler';
+import { ReactNode } from 'react';
 
 export type TypeProps = 'primary' | 'secondary';
 
 type ContainerProps = {
   type: TypeProps;
+  children: ReactNode;
 };
 
 export const Container = styled(RectButton)<ContainerProps>`
