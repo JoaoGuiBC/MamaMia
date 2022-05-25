@@ -7,7 +7,10 @@ import React, {
 } from 'react';
 import { Alert } from 'react-native';
 import { doc, getDoc } from 'firebase/firestore';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import {
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+} from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { auth, firestore } from '@utils/firebase';
@@ -21,6 +24,7 @@ type User = {
 type AuthContextData = {
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  forgotPassword: (email: string) => Promise<void>;
   isLoggingIn: boolean;
   user: User | null;
 };
@@ -94,6 +98,26 @@ function AuthProvider({ children }: AuthProviderProps) {
     setUser(null);
   }
 
+  async function forgotPassword(email: string) {
+    if (!email) {
+      return Alert.alert('Redefinir senha', 'Por favor, preencha o email');
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+
+      return Alert.alert(
+        'Redefinir senha',
+        'Enviamos um link para o seu email para que possa redefinir a sua senha',
+      );
+    } catch (error) {
+      return Alert.alert(
+        'Redefinir senha',
+        'Não foi possivel enviar um email para redefinir a sua senha',
+      );
+    }
+  }
+
   async function loadUserStorageData() {
     setIsLoggingIn(true);
 
@@ -116,6 +140,7 @@ function AuthProvider({ children }: AuthProviderProps) {
       value={{
         signIn,
         signOut,
+        forgotPassword,
         isLoggingIn,
         user,
       }}
