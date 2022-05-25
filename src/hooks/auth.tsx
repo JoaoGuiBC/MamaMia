@@ -1,7 +1,14 @@
-import React, { createContext, ReactNode, useContext, useState } from 'react';
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { Alert } from 'react-native';
-import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { auth, firestore } from '@utils/firebase';
 
@@ -13,6 +20,7 @@ type User = {
 
 type AuthContextData = {
   signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
   isLoggingIn: boolean;
   user: User | null;
 };
@@ -20,6 +28,8 @@ type AuthContextData = {
 type AuthProviderProps = {
   children: ReactNode;
 };
+
+const USER_COLLECTION = '@mamamia:users';
 
 export const AuthContext = createContext({} as AuthContextData);
 
@@ -39,7 +49,7 @@ function AuthProvider({ children }: AuthProviderProps) {
         const userRef = doc(firestore, 'users', account.user.uid);
 
         getDoc(userRef)
-          .then(profile => {
+          .then(async profile => {
             const { name, isAdmin } = profile.data() as User;
 
             if (profile.exists()) {
@@ -49,6 +59,10 @@ function AuthProvider({ children }: AuthProviderProps) {
                 isAdmin,
               };
 
+              await AsyncStorage.setItem(
+                USER_COLLECTION,
+                JSON.stringify(userData),
+              );
               setUser(userData);
             }
           })
@@ -73,10 +87,35 @@ function AuthProvider({ children }: AuthProviderProps) {
       .finally(() => setIsLoggingIn(false));
   }
 
+  async function signOut() {
+    await auth.signOut();
+    await AsyncStorage.removeItem(USER_COLLECTION);
+
+    setUser(null);
+  }
+
+  async function loadUserStorageData() {
+    setIsLoggingIn(true);
+
+    const storedUser = await AsyncStorage.getItem(USER_COLLECTION);
+
+    if (storedUser) {
+      const userData = JSON.parse(storedUser) as User;
+      setUser(userData);
+    }
+
+    setIsLoggingIn(false);
+  }
+
+  useEffect(() => {
+    loadUserStorageData();
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
         signIn,
+        signOut,
         isLoggingIn,
         user,
       }}
