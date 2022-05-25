@@ -7,7 +7,7 @@ import { useFonts, DMSans_400Regular } from '@expo-google-fonts/dm-sans';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 
 import { AuthProvider } from '@hooks/auth';
-import { SignIn } from '@screens/SignIn';
+import { Product } from '@screens/Product';
 
 import theme from './src/theme';
 
@@ -26,7 +26,7 @@ export default function App() {
       <StatusBar style="light" translucent backgroundColor="transparent" />
 
       <AuthProvider>
-        <SignIn />
+        <Product />
       </AuthProvider>
     </ThemeProvider>
   );
