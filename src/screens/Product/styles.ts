@@ -2,7 +2,6 @@ import styled, { css } from 'styled-components/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 
-import { Button } from '@components/Button';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export const Container = styled.KeyboardAvoidingView`

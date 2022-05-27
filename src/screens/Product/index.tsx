@@ -5,6 +5,7 @@ import { Platform, TouchableOpacity } from 'react-native';
 import { BackButton } from '@components/BackButton';
 import { Photo } from '@components/Photo';
 import { Button } from '@components/Button';
+import { PriceInput } from '@components/PriceInput';
 
 import {
   Container,
@@ -52,6 +53,10 @@ export function Product() {
           <Button title="Carregar" type="secondary" onPress={handlePickImage} />
         </PickImageButtonContainer>
       </Upload>
+
+      <PriceInput size="P" />
+      <PriceInput size="M" />
+      <PriceInput size="G" />
     </Container>
   );
 }
