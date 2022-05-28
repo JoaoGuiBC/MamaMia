@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import * as ImagePicker from 'expo-image-picker';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Platform, ScrollView, TouchableOpacity } from 'react-native';
 
 import { Photo } from '@components/Photo';
@@ -8,6 +10,9 @@ import { Button } from '@components/Button';
 import { BackButton } from '@components/BackButton';
 import { PriceInput } from '@components/PriceInput';
 
+import { CreateProductFormData, schema } from '@utils/schemas/createProduct';
+
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   Container,
   Header,
@@ -25,6 +30,14 @@ import {
 export function Product() {
   const [image, setImage] = useState('');
 
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
   async function handlePickImage() {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -39,6 +52,12 @@ export function Product() {
       }
     }
   }
+
+  async function handleCreateProduct(product: CreateProductFormData) {
+    console.log(product);
+  }
+
+  const onSubmit = (data: any) => handleCreateProduct(data);
 
   return (
     <Container behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -67,7 +86,7 @@ export function Product() {
         <Form>
           <InputGroup>
             <Label>Nome</Label>
-            <Input />
+            <Input control={control} name="name" errors={errors} />
           </InputGroup>
 
           <InputGroup>
@@ -76,18 +95,41 @@ export function Product() {
               <MaxCharacters>0 de 60 caracteres</MaxCharacters>
             </InputGroupHeader>
 
-            <Input multiline maxLength={60} />
+            <Input
+              control={control}
+              name="description"
+              errors={errors}
+              multiline
+              maxLength={60}
+            />
           </InputGroup>
 
           <InputGroup>
             <Label>Tamanhos e preços</Label>
 
-            <PriceInput size="P" />
-            <PriceInput size="M" />
-            <PriceInput size="G" />
+            <PriceInput
+              size="P"
+              control={control}
+              name="smallSizePrice"
+              errors={errors}
+            />
+            <PriceInput
+              size="M"
+              control={control}
+              name="mediumSizePrice"
+              errors={errors}
+            />
+            <PriceInput
+              size="G"
+              control={control}
+              name="largeSizePrice"
+              errors={errors}
+            />
           </InputGroup>
 
-          <Button title="Cadastrar pizza" />
+          <GestureHandlerRootView>
+            <Button title="Cadastrar pizza" onPress={handleSubmit(onSubmit)} />
+          </GestureHandlerRootView>
         </Form>
       </ScrollView>
     </Container>

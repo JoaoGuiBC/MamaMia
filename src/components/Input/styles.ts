@@ -9,6 +9,10 @@ type Props = {
   type: TypeProps;
 };
 
+type ContentProps = {
+  isErrored: boolean;
+};
+
 type ButtonChildren = {
   children?: ReactNode;
 };
@@ -18,15 +22,28 @@ type IconState = {
 };
 
 export const Container = styled.View`
+  margin-bottom: 16px;
+`;
+
+export const ErrorMessage = styled.Text`
+  font-size: 14px;
+
+  ${({ theme }) => css`
+    font-family: ${theme.FONTS.TEXT};
+    color: ${theme.COLORS.PRIMARY_800};
+  `}
+`;
+
+export const Content = styled.View<ContentProps>`
   width: 100%;
   height: 56px;
   background-color: transparent;
   border-radius: 12px;
-  margin-bottom: 16px;
   flex-direction: row;
 
-  ${({ theme }) => css`
-    border: 1px solid ${theme.COLORS.SHAPE};
+  ${({ theme, isErrored }) => css`
+    border: 1px solid
+      ${isErrored ? theme.COLORS.PRIMARY_800 : theme.COLORS.SHAPE};
   `}
 `;
 
