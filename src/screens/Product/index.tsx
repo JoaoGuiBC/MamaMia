@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as ImagePicker from 'expo-image-picker';
+import { doc, setDoc } from 'firebase/firestore';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Platform, ScrollView, TouchableOpacity } from 'react-native';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { Alert, Platform, ScrollView, TouchableOpacity } from 'react-native';
 
 import { Photo } from '@components/Photo';
 import { Input } from '@components/Input';
@@ -10,6 +12,8 @@ import { Button } from '@components/Button';
 import { BackButton } from '@components/BackButton';
 import { PriceInput } from '@components/PriceInput';
 
+import { storage, firestore } from '@utils/firebase';
+import { transformUriIntoBlob } from '@utils/transformUriIntoBlob';
 import { CreateProductFormData, schema } from '@utils/schemas/createProduct';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -29,6 +33,7 @@ import {
 
 export function Product() {
   const [image, setImage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     control,
@@ -54,7 +59,38 @@ export function Product() {
   }
 
   async function handleCreateProduct(product: CreateProductFormData) {
-    console.log(product);
+    setIsLoading(true);
+
+    const blob = await transformUriIntoBlob(image);
+
+    const filename = new Date().getTime();
+    const reference = ref(storage, `/pizzas/${filename}.png`);
+
+    await uploadBytes(reference, blob);
+    const photoUrl = await getDownloadURL(reference);
+
+    const docData = {
+      name: product.name,
+      name_insensitive: product.name.toLowerCase().trim(),
+      description: product.description,
+      prices_sizes: {
+        p: product.smallSizePrice,
+        m: product.mediumSizePrice,
+        l: product.largeSizePrice,
+      },
+      photo_url: photoUrl,
+      photo_path: reference.fullPath,
+    };
+    await setDoc(doc(firestore, 'pizzas', String(filename)), docData)
+      .then(() => Alert.alert('Cadastro', 'pizza cadastrada!'))
+      .catch(() =>
+        Alert.alert(
+          'Cadastro',
+          'houve um erro ao cadastrar a pizza, por favor tente novamente mais tarde',
+        ),
+      );
+
+    setIsLoading(false);
   }
 
   const onSubmit = (data: any) => handleCreateProduct(data);
@@ -86,7 +122,12 @@ export function Product() {
         <Form>
           <InputGroup>
             <Label>Nome</Label>
-            <Input control={control} name="name" errors={errors} />
+            <Input
+              control={control}
+              name="name"
+              errors={errors}
+              autoCapitalize="words"
+            />
           </InputGroup>
 
           <InputGroup>
@@ -128,7 +169,11 @@ export function Product() {
           </InputGroup>
 
           <GestureHandlerRootView>
-            <Button title="Cadastrar pizza" onPress={handleSubmit(onSubmit)} />
+            <Button
+              title="Cadastrar pizza"
+              isLoading={isLoading}
+              onPress={handleSubmit(onSubmit)}
+            />
           </GestureHandlerRootView>
         </Form>
       </ScrollView>
