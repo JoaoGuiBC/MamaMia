@@ -36,12 +36,15 @@ export function Product() {
   const [isLoading, setIsLoading] = useState(false);
 
   const {
+    watch,
     control,
     handleSubmit,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
   });
+
+  const watchDescription: string = watch('description');
 
   async function handlePickImage() {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -133,7 +136,9 @@ export function Product() {
           <InputGroup>
             <InputGroupHeader>
               <Label>Descrição</Label>
-              <MaxCharacters>0 de 60 caracteres</MaxCharacters>
+              <MaxCharacters>
+                {watchDescription?.length || 0} de 60 caracteres
+              </MaxCharacters>
             </InputGroupHeader>
 
             <Input
