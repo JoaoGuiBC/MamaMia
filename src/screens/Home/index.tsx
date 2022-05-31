@@ -1,12 +1,27 @@
-import React from 'react';
-import { TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from 'styled-components/native';
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  TouchableOpacity,
+} from 'react-native';
+import {
+  collection,
+  endAt,
+  getDocs,
+  orderBy,
+  query,
+  startAt,
+} from 'firebase/firestore';
 
 import happyEmojiImg from '@assets/happy.png';
 
 import { Search } from '@components/Search';
-import { ProductCard } from '@components/ProductCard';
+import { ProductCard, ProductData } from '@components/ProductCard';
+
+import { firestore } from '@utils/firebase';
 
 import {
   Container,
@@ -20,7 +35,51 @@ import {
 } from './styles';
 
 export function Home() {
+  const [pizzas, setPizzas] = useState<ProductData[]>([]);
+
   const { COLORS } = useTheme();
+
+  async function fetchPizzas(value: string) {
+    const formattedValue = value.toLowerCase().trim();
+
+    try {
+      const pizzasQuery = query(
+        collection(firestore, 'pizzas'),
+        orderBy('name_insensitive'),
+        startAt(formattedValue),
+        endAt(`${formattedValue}\uf8ff`),
+      );
+
+      const pizzaQuerySnapshot = await getDocs(pizzasQuery);
+
+      let pizzasData: ProductData[] = [];
+
+      pizzaQuerySnapshot.forEach(doc => {
+        const data = doc.data();
+
+        pizzasData = [
+          ...pizzasData,
+          {
+            id: doc.id,
+            description: data.description,
+            photo_url: data.photo_url,
+            name: data.name,
+          },
+        ];
+      });
+
+      setPizzas(pizzasData);
+    } catch (_) {
+      return Alert.alert(
+        'Busca de pizzas',
+        'Não foi possível buscar pelas pizzas, por favor tente novamente mais tarde',
+      );
+    }
+  }
+
+  useEffect(() => {
+    fetchPizzas('');
+  }, []);
 
   return (
     <Container>
@@ -39,28 +98,27 @@ export function Home() {
 
       <MenuHeader>
         <Title>Cardápio</Title>
-        <MenuItemCounter>5 pizzas</MenuItemCounter>
+        <MenuItemCounter>{pizzas.length} pizzas</MenuItemCounter>
       </MenuHeader>
 
-      <ProductCard
-        data={{
-          id: '1',
-          name: 'Pizza',
-          description: 'Ingrediente 1, ingrediente 2',
-          photo_url:
-            'https://www.seekpng.com/png/full/148-1483373_cheese-pizza-cheese-pizza-top-view-png.png',
-        }}
-      />
-
-      <ProductCard
-        data={{
-          id: '2',
-          name: 'Pizza',
-          description: 'Ingrediente 1, ingrediente 2',
-          photo_url:
-            'https://www.seekpng.com/png/full/148-1483373_cheese-pizza-cheese-pizza-top-view-png.png',
-        }}
-      />
+      {pizzas.length === 0 ? (
+        <ActivityIndicator
+          size="large"
+          color={COLORS.PRIMARY_900}
+          style={{ marginTop: 40 }}
+        />
+      ) : (
+        <FlatList
+          data={pizzas}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => <ProductCard data={item} />}
+          contentContainerStyle={{
+            paddingTop: 20,
+            paddingBottom: 125,
+            marginHorizontal: 24,
+          }}
+        />
+      )}
     </Container>
   );
 }
