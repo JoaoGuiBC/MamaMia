@@ -6,6 +6,7 @@ import { useTheme } from 'styled-components/native';
 import happyEmojiImg from '@assets/happy.png';
 
 import { Search } from '@components/Search';
+import { ProductCard } from '@components/ProductCard';
 
 import {
   Container,
@@ -13,6 +14,9 @@ import {
   GreetingsEmoji,
   GreetingsText,
   Header,
+  MenuHeader,
+  MenuItemCounter,
+  Title,
 } from './styles';
 
 export function Home() {
@@ -32,6 +36,31 @@ export function Home() {
       </Header>
 
       <Search onSearch={() => {}} onClear={() => {}} />
+
+      <MenuHeader>
+        <Title>Cardápio</Title>
+        <MenuItemCounter>5 pizzas</MenuItemCounter>
+      </MenuHeader>
+
+      <ProductCard
+        data={{
+          id: '1',
+          name: 'Pizza',
+          description: 'Ingrediente 1, ingrediente 2',
+          photo_url:
+            'https://www.seekpng.com/png/full/148-1483373_cheese-pizza-cheese-pizza-top-view-png.png',
+        }}
+      />
+
+      <ProductCard
+        data={{
+          id: '2',
+          name: 'Pizza',
+          description: 'Ingrediente 1, ingrediente 2',
+          photo_url:
+            'https://www.seekpng.com/png/full/148-1483373_cheese-pizza-cheese-pizza-top-view-png.png',
+        }}
+      />
     </Container>
   );
 }
