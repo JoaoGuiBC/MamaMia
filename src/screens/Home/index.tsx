@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from 'styled-components/native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   ActivityIndicator,
   Alert,
@@ -36,10 +37,13 @@ import {
 
 export function Home() {
   const [pizzas, setPizzas] = useState<ProductData[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [search, setSearch] = useState('');
 
   const { COLORS } = useTheme();
 
   async function fetchPizzas(value: string) {
+    setIsLoading(true);
     const formattedValue = value.toLowerCase().trim();
 
     try {
@@ -47,7 +51,7 @@ export function Home() {
         collection(firestore, 'pizzas'),
         orderBy('name_insensitive'),
         startAt(formattedValue),
-        endAt(`${formattedValue}\uf8ff`),
+        endAt(`${formattedValue}~`),
       );
 
       const pizzaQuerySnapshot = await getDocs(pizzasQuery);
@@ -56,7 +60,6 @@ export function Home() {
 
       pizzaQuerySnapshot.forEach(doc => {
         const data = doc.data();
-
         pizzasData = [
           ...pizzasData,
           {
@@ -69,12 +72,24 @@ export function Home() {
       });
 
       setPizzas(pizzasData);
-    } catch (_) {
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+
       return Alert.alert(
         'Busca de pizzas',
         'Não foi possível buscar pelas pizzas, por favor tente novamente mais tarde',
       );
     }
+  }
+
+  function handleSearch() {
+    fetchPizzas(search);
+  }
+
+  function handleCleanSearch() {
+    setSearch('');
+    fetchPizzas('');
   }
 
   useEffect(() => {
@@ -94,14 +109,21 @@ export function Home() {
         </TouchableOpacity>
       </Header>
 
-      <Search onSearch={() => {}} onClear={() => {}} />
+      <GestureHandlerRootView>
+        <Search
+          onChangeText={setSearch}
+          value={search}
+          onSearch={handleSearch}
+          onClear={handleCleanSearch}
+        />
+      </GestureHandlerRootView>
 
       <MenuHeader>
         <Title>Cardápio</Title>
         <MenuItemCounter>{pizzas.length} pizzas</MenuItemCounter>
       </MenuHeader>
 
-      {pizzas.length === 0 ? (
+      {isLoading ? (
         <ActivityIndicator
           size="large"
           color={COLORS.PRIMARY_900}
