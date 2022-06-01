@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from 'styled-components/native';
+import { useNavigation } from '@react-navigation/native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   ActivityIndicator,
@@ -41,6 +42,7 @@ export function Home() {
   const [search, setSearch] = useState('');
 
   const { COLORS } = useTheme();
+  const { navigate } = useNavigation();
 
   async function fetchPizzas(value: string) {
     setIsLoading(true);
@@ -92,6 +94,10 @@ export function Home() {
     fetchPizzas('');
   }
 
+  function handleSelect(id: string) {
+    navigate('product', { id });
+  }
+
   useEffect(() => {
     fetchPizzas('');
   }, []);
@@ -130,16 +136,20 @@ export function Home() {
           style={{ marginTop: 40 }}
         />
       ) : (
-        <FlatList
-          data={pizzas}
-          keyExtractor={item => item.id}
-          renderItem={({ item }) => <ProductCard data={item} />}
-          contentContainerStyle={{
-            paddingTop: 20,
-            paddingBottom: 125,
-            marginHorizontal: 24,
-          }}
-        />
+        <GestureHandlerRootView>
+          <FlatList
+            data={pizzas}
+            keyExtractor={item => item.id}
+            renderItem={({ item }) => (
+              <ProductCard data={item} onPress={() => handleSelect(item.id)} />
+            )}
+            contentContainerStyle={{
+              paddingTop: 20,
+              paddingBottom: 125,
+              marginHorizontal: 24,
+            }}
+          />
+        </GestureHandlerRootView>
       )}
     </Container>
   );

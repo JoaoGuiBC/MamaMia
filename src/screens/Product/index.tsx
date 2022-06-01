@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as ImagePicker from 'expo-image-picker';
-import { doc, setDoc } from 'firebase/firestore';
+import { useTheme } from 'styled-components/native';
+import { useRoute } from '@react-navigation/native';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { Alert, Platform, ScrollView, TouchableOpacity } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import {
+  ActivityIndicator,
+  Alert,
+  Platform,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 
 import { Photo } from '@components/Photo';
 import { Input } from '@components/Input';
@@ -12,11 +21,14 @@ import { Button } from '@components/Button';
 import { BackButton } from '@components/BackButton';
 import { PriceInput } from '@components/PriceInput';
 
+import type { ProductData } from '@components/ProductCard';
+
 import { storage, firestore } from '@utils/firebase';
 import { transformUriIntoBlob } from '@utils/transformUriIntoBlob';
 import { CreateProductFormData, schema } from '@utils/schemas/createProduct';
 
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { ProductNavigationProps } from '../../@types/navigation';
+
 import {
   Container,
   Header,
@@ -31,13 +43,29 @@ import {
   MaxCharacters,
 } from './styles';
 
+type PizzaResponse = ProductData & {
+  photo_path: string;
+  prices_sizes: {
+    p: string;
+    m: string;
+    l: string;
+  };
+};
+
 export function Product() {
   const [image, setImage] = useState('');
+  const [photoPath, setPhotoPath] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
+
+  const { COLORS } = useTheme();
+  const route = useRoute();
+  const { id } = route.params as ProductNavigationProps;
 
   const {
     watch,
     control,
+    setValue,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -98,6 +126,33 @@ export function Product() {
 
   const onSubmit = (data: any) => handleCreateProduct(data);
 
+  useEffect(() => {
+    if (id) {
+      setIsFetching(true);
+      const docRef = doc(firestore, 'pizzas', id);
+
+      getDoc(docRef).then(response => {
+        const product = response.data() as PizzaResponse;
+
+        setImage(product.photo_url);
+        setPhotoPath(product.photo_path);
+
+        setValue('name', product.name, { shouldValidate: true });
+        setValue('description', product.description, { shouldValidate: true });
+        setValue('smallSizePrice', `${product.prices_sizes.p}`, {
+          shouldValidate: true,
+        });
+        setValue('mediumSizePrice', `${product.prices_sizes.m}`, {
+          shouldValidate: true,
+        });
+        setValue('largeSizePrice', `${product.prices_sizes.l}`, {
+          shouldValidate: true,
+        });
+        setIsFetching(false);
+      });
+    }
+  }, [id]);
+
   return (
     <Container behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Header>
@@ -110,17 +165,25 @@ export function Product() {
         </TouchableOpacity>
       </Header>
       <ScrollView>
-        <Upload>
-          <Photo uri={image} />
+        {isFetching ? (
+          <ActivityIndicator
+            size="large"
+            color={COLORS.PRIMARY_900}
+            style={{ marginTop: 40 }}
+          />
+        ) : (
+          <Upload>
+            <Photo uri={image} />
 
-          <PickImageButtonContainer>
-            <Button
-              title="Carregar"
-              type="secondary"
-              onPress={handlePickImage}
-            />
-          </PickImageButtonContainer>
-        </Upload>
+            <PickImageButtonContainer>
+              <Button
+                title="Carregar"
+                type="secondary"
+                onPress={handlePickImage}
+              />
+            </PickImageButtonContainer>
+          </Upload>
+        )}
 
         <Form>
           <InputGroup>
