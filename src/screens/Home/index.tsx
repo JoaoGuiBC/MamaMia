@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from 'styled-components/native';
 import { useNavigation } from '@react-navigation/native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   ActivityIndicator,
   Alert,
@@ -33,6 +32,7 @@ import {
   Header,
   MenuHeader,
   MenuItemCounter,
+  NewProductButton,
   Title,
 } from './styles';
 
@@ -98,6 +98,10 @@ export function Home() {
     navigate('product', { id });
   }
 
+  function handleAdd() {
+    navigate('product', {});
+  }
+
   useEffect(() => {
     fetchPizzas('');
   }, []);
@@ -115,14 +119,12 @@ export function Home() {
         </TouchableOpacity>
       </Header>
 
-      <GestureHandlerRootView>
-        <Search
-          onChangeText={setSearch}
-          value={search}
-          onSearch={handleSearch}
-          onClear={handleCleanSearch}
-        />
-      </GestureHandlerRootView>
+      <Search
+        onChangeText={setSearch}
+        value={search}
+        onSearch={handleSearch}
+        onClear={handleCleanSearch}
+      />
 
       <MenuHeader>
         <Title>Cardápio</Title>
@@ -136,21 +138,25 @@ export function Home() {
           style={{ marginTop: 40 }}
         />
       ) : (
-        <GestureHandlerRootView>
-          <FlatList
-            data={pizzas}
-            keyExtractor={item => item.id}
-            renderItem={({ item }) => (
-              <ProductCard data={item} onPress={() => handleSelect(item.id)} />
-            )}
-            contentContainerStyle={{
-              paddingTop: 20,
-              paddingBottom: 125,
-              marginHorizontal: 24,
-            }}
-          />
-        </GestureHandlerRootView>
+        <FlatList
+          data={pizzas}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <ProductCard data={item} onPress={() => handleSelect(item.id)} />
+          )}
+          contentContainerStyle={{
+            paddingTop: 20,
+            paddingBottom: 125,
+            marginHorizontal: 24,
+          }}
+        />
       )}
+
+      <NewProductButton
+        title="Cadastrar Nova Pizza"
+        type="secondary"
+        onPress={handleAdd}
+      />
     </Container>
   );
 }

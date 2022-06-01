@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as ImagePicker from 'expo-image-picker';
 import { useTheme } from 'styled-components/native';
-import { useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -13,6 +13,7 @@ import {
   Platform,
   ScrollView,
   TouchableOpacity,
+  View,
 } from 'react-native';
 
 import { Photo } from '@components/Photo';
@@ -58,8 +59,9 @@ export function Product() {
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
 
-  const { COLORS } = useTheme();
   const route = useRoute();
+  const { COLORS } = useTheme();
+  const { goBack } = useNavigation();
   const { id } = route.params as ProductNavigationProps;
 
   const {
@@ -126,6 +128,10 @@ export function Product() {
 
   const onSubmit = (data: any) => handleCreateProduct(data);
 
+  function handleGoBack() {
+    goBack();
+  }
+
   useEffect(() => {
     if (id) {
       setIsFetching(true);
@@ -156,13 +162,17 @@ export function Product() {
   return (
     <Container behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Header>
-        <BackButton />
+        <BackButton onPress={handleGoBack} />
 
         <Title>Cadastrar</Title>
 
-        <TouchableOpacity>
-          <DeleteLabel>Deletar</DeleteLabel>
-        </TouchableOpacity>
+        {id ? (
+          <TouchableOpacity>
+            <DeleteLabel>Deletar</DeleteLabel>
+          </TouchableOpacity>
+        ) : (
+          <View style={{ width: 24 }} />
+        )}
       </Header>
       <ScrollView>
         {isFetching ? (
