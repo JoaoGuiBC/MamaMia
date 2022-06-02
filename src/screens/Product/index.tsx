@@ -101,17 +101,19 @@ export function Product() {
   async function handleCreateProduct(product: CreateProductFormData) {
     setIsLoading(true);
 
+    const name_insensitive = product.name.toLowerCase().trim();
+
     const blob = await transformUriIntoBlob(image);
 
     const filename = new Date().getTime();
-    const reference = ref(storage, `/pizzas/${filename}.png`);
+    const reference = ref(storage, `/pizzas/${name_insensitive}.png`);
 
     await uploadBytes(reference, blob);
     const photoUrl = await getDownloadURL(reference);
 
     const docData = {
       name: product.name,
-      name_insensitive: product.name.toLowerCase().trim(),
+      name_insensitive,
       description: product.description,
       prices_sizes: {
         p: product.smallSizePrice,
@@ -138,12 +140,13 @@ export function Product() {
 
     let photo_url = image;
     let photo_path = photoPath;
+    const name_insensitive = product.name.toLowerCase().trim();
 
     if (isImageUpdated) {
       await deleteObject(ref(storage, photoPath));
       const blob = await transformUriIntoBlob(image);
 
-      const reference = ref(storage, `/pizzas/${id}.png`);
+      const reference = ref(storage, `/pizzas/${name_insensitive}.png`);
 
       photo_path = reference.fullPath;
 
@@ -153,7 +156,7 @@ export function Product() {
 
     const docData = {
       name: product.name,
-      name_insensitive: product.name.toLowerCase().trim(),
+      name_insensitive,
       description: product.description,
       prices_sizes: {
         p: product.smallSizePrice,
