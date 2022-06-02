@@ -4,7 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useTheme } from 'styled-components/native';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { deleteDoc, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   ref,
@@ -165,7 +165,7 @@ export function Product() {
     };
 
     await updateDoc(doc(firestore, 'pizzas', id!), docData)
-      .then(() => goBack())
+      .then(async () => goBack())
       .catch(() =>
         Alert.alert(
           'Cadastro',
@@ -181,6 +181,21 @@ export function Product() {
 
   function handleGoBack() {
     goBack();
+  }
+
+  async function handleDelete() {
+    await deleteDoc(doc(firestore, 'pizzas', id!))
+      .then(async () => {
+        await deleteObject(ref(storage, photoPath));
+
+        goBack();
+      })
+      .catch(() =>
+        Alert.alert(
+          'Remoção',
+          'houve um erro ao deletar a pizza, por favor tente novamente mais tarde',
+        ),
+      );
   }
 
   useEffect(() => {
@@ -218,7 +233,7 @@ export function Product() {
         <Title>Cadastrar</Title>
 
         {id ? (
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleDelete}>
             <DeleteLabel>Deletar</DeleteLabel>
           </TouchableOpacity>
         ) : (
