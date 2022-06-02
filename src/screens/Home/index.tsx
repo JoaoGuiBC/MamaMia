@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from 'styled-components/native';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import {
   ActivityIndicator,
   Alert,
@@ -102,9 +102,11 @@ export function Home() {
     navigate('product', {});
   }
 
-  useEffect(() => {
-    fetchPizzas('');
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchPizzas('');
+    }, []),
+  );
 
   return (
     <Container>
@@ -135,7 +137,7 @@ export function Home() {
         <ActivityIndicator
           size="large"
           color={COLORS.PRIMARY_900}
-          style={{ marginTop: 40 }}
+          style={{ marginVertical: 40 }}
         />
       ) : (
         <FlatList

@@ -26,18 +26,20 @@
         "project": "./tsconfig.json"
     },
     "rules": {
-        "import/prefer-default-export": "off",
         "react/jsx-filename-extension": [
             "warn",
             { "extensions": [".jsx", ".js", ".tsx", ".ts"]}
         ],
-        "react/jsx-props-no-spreading": "off",
-        "react/require-default-props": "off",
-        "react/style-prop-object": "off",
-        "@typescript-eslint/no-empty-interface": "off",
         "consistent-return": "off",
-        "react/jsx-no-constructed-context-values": "off",
         "react/jsx-no-bind": "off",
-        "import/no-extraneous-dependencies": "off"
+        "react/style-prop-object": "off",
+        "react/require-default-props": "off",
+        "import/prefer-default-export": "off",
+        "react/jsx-props-no-spreading": "off",
+        "import/no-extraneous-dependencies": "off",
+        "@typescript-eslint/naming-convention": "off",
+        "@typescript-eslint/no-empty-interface": "off",
+        "react/jsx-no-constructed-context-values": "off",
+        "@typescript-eslint/no-non-null-assertion": "off"
     }
 }

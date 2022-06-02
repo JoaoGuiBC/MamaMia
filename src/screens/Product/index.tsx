@@ -2,11 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as ImagePicker from 'expo-image-picker';
 import { useTheme } from 'styled-components/native';
-import { useNavigation, useRoute } from '@react-navigation/native';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from 'firebase/storage';
 import {
   ActivityIndicator,
   Alert,
@@ -58,6 +63,7 @@ export function Product() {
   const [photoPath, setPhotoPath] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
+  const [isImageUpdated, setIsImageUpdated] = useState(false);
 
   const route = useRoute();
   const { COLORS } = useTheme();
@@ -87,6 +93,7 @@ export function Product() {
 
       if (!result.cancelled) {
         setImage(result.uri);
+        setIsImageUpdated(true);
       }
     }
   }
@@ -126,7 +133,51 @@ export function Product() {
     setIsLoading(false);
   }
 
-  const onSubmit = (data: any) => handleCreateProduct(data);
+  async function handleUpdateProduct(product: CreateProductFormData) {
+    setIsLoading(true);
+
+    let photo_url = image;
+    let photo_path = photoPath;
+
+    if (isImageUpdated) {
+      await deleteObject(ref(storage, photoPath));
+      const blob = await transformUriIntoBlob(image);
+
+      const reference = ref(storage, `/pizzas/${id}.png`);
+
+      photo_path = reference.fullPath;
+
+      await uploadBytes(reference, blob);
+      photo_url = await getDownloadURL(reference);
+    }
+
+    const docData = {
+      name: product.name,
+      name_insensitive: product.name.toLowerCase().trim(),
+      description: product.description,
+      prices_sizes: {
+        p: product.smallSizePrice,
+        m: product.mediumSizePrice,
+        l: product.largeSizePrice,
+      },
+      photo_url,
+      photo_path,
+    };
+
+    await updateDoc(doc(firestore, 'pizzas', id!), docData)
+      .then(() => goBack())
+      .catch(() =>
+        Alert.alert(
+          'Cadastro',
+          'houve um erro ao atualizar a pizza, por favor tente novamente mais tarde',
+        ),
+      );
+
+    setIsLoading(false);
+  }
+
+  const onSubmitCreate = (data: any) => handleCreateProduct(data);
+  const onSubmitUpdate = (data: any) => handleUpdateProduct(data);
 
   function handleGoBack() {
     goBack();
@@ -247,11 +298,19 @@ export function Product() {
           </InputGroup>
 
           <GestureHandlerRootView>
-            <Button
-              title="Cadastrar pizza"
-              isLoading={isLoading}
-              onPress={handleSubmit(onSubmit)}
-            />
+            {id ? (
+              <Button
+                title="Editar pizza"
+                isLoading={isLoading}
+                onPress={handleSubmit(onSubmitUpdate)}
+              />
+            ) : (
+              <Button
+                title="Cadastrar pizza"
+                isLoading={isLoading}
+                onPress={handleSubmit(onSubmitCreate)}
+              />
+            )}
           </GestureHandlerRootView>
         </Form>
       </ScrollView>
