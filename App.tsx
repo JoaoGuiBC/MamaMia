@@ -7,6 +7,7 @@ import { useFonts, DMSans_400Regular } from '@expo-google-fonts/dm-sans';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 
 import { AuthProvider } from '@hooks/auth';
+import { Order } from '@screens/Order';
 import { Routes } from './src/routes';
 
 import theme from './src/theme';
@@ -26,7 +27,7 @@ export default function App() {
       <StatusBar style="light" translucent backgroundColor="transparent" />
 
       <AuthProvider>
-        <Routes />
+        <Order />
       </AuthProvider>
     </ThemeProvider>
   );
