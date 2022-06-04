@@ -16,6 +16,14 @@ export const Image = styled.Image`
   border-radius: 120px;
 `;
 
+export const Sizes = styled.View`
+  flex-direction: row;
+  justify-content: center;
+
+  width: 100%;
+  margin-bottom: 40px;
+`;
+
 export const Header = styled(LinearGradient).attrs(({ theme }) => ({
   colors: theme.COLORS.GRADIENT,
 }))`
