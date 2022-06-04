@@ -37,6 +37,7 @@
         "import/prefer-default-export": "off",
         "react/jsx-props-no-spreading": "off",
         "import/no-extraneous-dependencies": "off",
+        "react/no-unstable-nested-components": "off",
         "@typescript-eslint/naming-convention": "off",
         "@typescript-eslint/no-empty-interface": "off",
         "react/jsx-no-constructed-context-values": "off",
