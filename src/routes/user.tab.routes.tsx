@@ -6,6 +6,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Home } from '@screens/Home';
 import { ListOrders } from '@screens/ListOrders';
 
+import { BottomMenu } from '@components/BottomMenu';
+
 const { Navigator, Screen } = createBottomTabNavigator();
 
 export function UserTabRoutes() {
@@ -19,13 +21,29 @@ export function UserTabRoutes() {
         headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: {
-          height: 64,
+          height: 56,
           paddingVertical: Platform.OS === 'ios' ? 20 : 0,
         },
       }}
     >
-      <Screen name="home" component={Home} />
-      <Screen name="listOrders" component={ListOrders} />
+      <Screen
+        name="home"
+        component={Home}
+        options={{
+          tabBarIcon: ({ color }) => (
+            <BottomMenu color={color} title="Cardápio" />
+          ),
+        }}
+      />
+      <Screen
+        name="listOrders"
+        component={ListOrders}
+        options={{
+          tabBarIcon: ({ color }) => (
+            <BottomMenu color={color} title="Pedidos" notifications="0" />
+          ),
+        }}
+      />
     </Navigator>
   );
 }
