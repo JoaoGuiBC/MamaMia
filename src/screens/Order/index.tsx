@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Alert, Platform } from 'react-native';
 import { useForm } from 'react-hook-form';
+import { Alert, Platform } from 'react-native';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useNavigation } from '@react-navigation/native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { PIZZA_TYPES } from '@utils/pizzaTypes';
 import { OrderPizzaFormData, schema } from '@utils/schemas/orderPizza';
@@ -11,7 +13,6 @@ import { RadioButton } from '@components/RadioButton';
 import { Input } from '@components/Input';
 import { Button } from '@components/Button';
 
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   Container,
   ContentScroll,
@@ -28,6 +29,8 @@ import {
 
 export function Order() {
   const [selectedSize, setSelectedSize] = useState('');
+
+  const { goBack } = useNavigation();
 
   const {
     control,
@@ -46,14 +49,15 @@ export function Order() {
 
   const onSubmit = (data: any) => handleOrderPizza(data);
 
+  function handleGoBack() {
+    goBack();
+  }
+
   return (
     <Container behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ContentScroll>
         <Header>
-          <BackButton
-            onPress={() => console.log('a')}
-            style={{ marginBottom: 108 }}
-          />
+          <BackButton onPress={handleGoBack} style={{ marginBottom: 108 }} />
         </Header>
 
         <Image

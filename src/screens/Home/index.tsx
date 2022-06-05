@@ -44,7 +44,7 @@ export function Home() {
 
   const { COLORS } = useTheme();
   const { navigate } = useNavigation();
-  const { signOut } = UseAuth();
+  const { signOut, user } = UseAuth();
 
   async function fetchPizzas(value: string) {
     setIsLoading(true);
@@ -97,7 +97,8 @@ export function Home() {
   }
 
   function handleSelect(id: string) {
-    navigate('product', { id });
+    const route = user?.isAdmin ? 'product' : 'order';
+    navigate(route, { id });
   }
 
   function handleAdd() {
@@ -156,11 +157,13 @@ export function Home() {
         />
       )}
 
-      <NewProductButton
-        title="Cadastrar Nova Pizza"
-        type="secondary"
-        onPress={handleAdd}
-      />
+      {user?.isAdmin && (
+        <NewProductButton
+          title="Cadastrar Nova Pizza"
+          type="secondary"
+          onPress={handleAdd}
+        />
+      )}
     </Container>
   );
 }
