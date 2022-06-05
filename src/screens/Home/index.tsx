@@ -22,6 +22,7 @@ import happyEmojiImg from '@assets/happy.png';
 import { Search } from '@components/Search';
 import { ProductCard, ProductData } from '@components/ProductCard';
 
+import { UseAuth } from '@hooks/auth';
 import { firestore } from '@utils/firebase';
 
 import {
@@ -43,6 +44,7 @@ export function Home() {
 
   const { COLORS } = useTheme();
   const { navigate } = useNavigation();
+  const { signOut } = UseAuth();
 
   async function fetchPizzas(value: string) {
     setIsLoading(true);
@@ -116,7 +118,7 @@ export function Home() {
           <GreetingsText>Olá, John Doe</GreetingsText>
         </Greetings>
 
-        <TouchableOpacity>
+        <TouchableOpacity onPress={signOut}>
           <MaterialIcons name="logout" color={COLORS.TITLE} size={24} />
         </TouchableOpacity>
       </Header>
